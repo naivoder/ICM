@@ -75,7 +75,7 @@ class A3C(torch.nn.Module):
 
         return torch.tensor(gae, dtype=torch.float)
 
-    def calculate_cost(
+    def calculate_loss(
         self,
         next_state,
         hidden_state,
