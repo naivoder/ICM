@@ -28,9 +28,9 @@ def worker(
     shape = [input_shape[1], input_shape[2], 1]
     env = make_env(env_id, shape)
 
-    episode, max_steps, t_steps, scores = 0, 5e5, 0, []
+    episode, max_eps, t_steps, scores = 0, 1000, 0, []
 
-    while t_steps < max_steps:
+    while episode < max_eps:
         state, _ = env.reset()
         score, ep_steps = 0, 0
         term = trunc = False
@@ -57,7 +57,7 @@ def worker(
                     states, next_states, actions
                 )
 
-                loss = local_agent.calculate_cost(
+                loss = local_agent.calculate_loss(
                     state_,
                     hx,
                     rewards,
@@ -101,10 +101,9 @@ def worker(
         if name == "1":
             scores.append(score)
             avg_score = np.mean(scores[-100:])
-            avg_score_5k = np.mean(scores[max(0, episode - 5000) : episode + 1])
 
             print(
-                f"Episode: {episode}, Score: {score:.2f}, Avg Score (100) (5k): {avg_score:.2f} {avg_score_5k:.2f}"
+                f"Ep: {episode}/{max_eps}, Score: {score:.2f}, Reward: {intrinsic_reward.sum().item():.2f}, Avg Score: {avg_score:.2f}"
             )
 
     if name == "1":
