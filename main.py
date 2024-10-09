@@ -4,6 +4,7 @@ from shared_adam import SharedAdam
 from worker import worker
 from agent import A3C
 from icm import ICM
+import gymnasium as gym
 
 os.environ["OMP_NUM_THREADS"] = "1"
 
@@ -47,9 +48,14 @@ if __name__ == "__main__":
     mp.set_start_method("forkserver")
     gloabl_ep = mp.Value("i", 0)
 
-    env_id = "SpaceInvadersNoFrameskip-v4"
-    n_threads = 4
-    n_actions = 6  # need to change this to be dynamic
+    env_id = "FreewayNoFrameskip-v4"
+    config_env = gym.make(env_id)
+
+    print("Observation space:", config_env.observation_space)
+    print("Action space:", config_env.action_space)
+
+    n_threads = 16
+    n_actions = config_env.action_space.n
     input_shape = (4, 42, 42)
 
     env = ParallelEnv(env_id, n_threads, input_shape, n_actions, gloabl_ep)
