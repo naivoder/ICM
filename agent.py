@@ -3,7 +3,7 @@ import numpy as np
 
 
 class A3C(torch.nn.Module):
-    def __init__(self, state_size, n_actions, gamma=0.99, entropy_scale=0.01, tau=0.95):
+    def __init__(self, state_size, n_actions, gamma=0.99, entropy_scale=0.01, tau=0.98):
         super(A3C, self).__init__()
         self.gamma = gamma
         self.entropy_scale = entropy_scale
@@ -47,7 +47,7 @@ class A3C(torch.nn.Module):
         action = dist.sample()
         log_prob = dist.log_prob(action)
 
-        return action.numpy()[0], v, log_prob, hidden_state
+        return action.numpy().item(), v, log_prob, hidden_state
 
     def _calculate_returns(self, rewards, values, done):
         values = torch.cat(values).squeeze()

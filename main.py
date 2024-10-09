@@ -48,13 +48,13 @@ if __name__ == "__main__":
     mp.set_start_method("forkserver")
     gloabl_ep = mp.Value("i", 0)
 
-    env_id = "FreewayNoFrameskip-v4"
+    env_id = "MsPacmanNoFrameskip-v4"
     config_env = gym.make(env_id)
 
     print("Observation space:", config_env.observation_space)
     print("Action space:", config_env.action_space)
 
-    n_threads = 16
+    n_threads = 4
     n_actions = config_env.action_space.n
     input_shape = (4, 42, 42)
 
