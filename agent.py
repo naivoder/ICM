@@ -23,6 +23,17 @@ class A3C(torch.nn.Module):
         self.pi = torch.nn.Linear(256, n_actions)
         self.v = torch.nn.Linear(256, 1)
 
+        self._initialize_weights()
+
+    def _initialize_weights(self):
+        for m in self.modules():
+            if isinstance(m, torch.nn.Conv2d) or isinstance(m, torch.nn.Linear):
+                torch.nn.init.orthogonal_(m.weight)
+                if isinstance(m, torch.nn.Linear):
+                    m.weight.data.mul_(1 / 100)
+                if m.bias is not None:
+                    torch.nn.init.constant_(m.bias, 0)
+
     def _calculate_conv_shape(self, state_size):
         o = self.conv1(torch.zeros(1, *state_size))
         o = self.conv2(o)
