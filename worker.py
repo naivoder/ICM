@@ -18,7 +18,7 @@ def worker(
     env_id,
     global_idx,
 ):
-    T_MAX = 20
+    T_MAX = 50
 
     local_agent = A3C(input_shape, n_actions)
     local_icm = ICM(input_shape, n_actions)
@@ -68,11 +68,7 @@ def worker(
                 )
 
                 optimizer.zero_grad()
-                icm_optimizer.zero_grad()
-
                 hx = hx.detach()
-
-                (inv_loss + forward_loss).backward()
                 loss.backward()
                 torch.nn.utils.clip_grad_norm_(local_agent.parameters(), 40)
 
@@ -81,15 +77,19 @@ def worker(
                 ):
                     global_param._grad = local_param.grad
 
+                optimizer.step()
+                local_agent.load_state_dict(global_agent.state_dict())
+
+                icm_optimizer.zero_grad()
+                (inv_loss + forward_loss).backward()
+                torch.nn.utils.clip_grad_norm_(local_icm.parameters(), 40)
+
                 for local_param, global_param in zip(
                     local_icm.parameters(), global_icm.parameters()
                 ):
                     global_param._grad = local_param.grad
 
-                optimizer.step()
                 icm_optimizer.step()
-
-                local_agent.load_state_dict(global_agent.state_dict())
                 local_icm.load_state_dict(global_icm.state_dict())
 
                 memory.clear()

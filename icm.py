@@ -3,12 +3,12 @@ import numpy as np
 
 
 class ICM(torch.nn.Module):
-    def __init__(self, input_dims, n_actions=3, alpha=0.1, beta=0.2):
+    def __init__(self, input_dims, n_actions, alpha=0.1, beta=0.2):
         super(ICM, self).__init__()
         self.alpha = alpha
         self.beta = beta
 
-        n_channels = 4
+        n_channels = input_dims[0]
         self.conv1 = torch.nn.Conv2d(n_channels, 32, kernel_size=3, stride=2, padding=1)
         self.conv2 = torch.nn.Conv2d(32, 32, 3, 2, 1)
         self.conv3 = torch.nn.Conv2d(32, 32, 3, 2, 1)

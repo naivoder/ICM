@@ -19,8 +19,8 @@ class ParallelEnv:
         global_icm = ICM(input_shape, n_actions)
         global_icm.share_memory()  # ???
 
-        optimizer = SharedAdam(global_agent.parameters(), lr=1e-4)
-        icm_optimizer = SharedAdam(global_icm.parameters(), lr=1e-4)
+        optimizer = SharedAdam(global_agent.parameters(), lr=3e-4)
+        icm_optimizer = SharedAdam(global_icm.parameters(), lr=3e-4)
 
         self.ps = [
             mp.Process(
@@ -54,7 +54,7 @@ if __name__ == "__main__":
     print("Observation space:", config_env.observation_space)
     print("Action space:", config_env.action_space)
 
-    n_threads = 4
+    n_threads = 8
     n_actions = config_env.action_space.n
     input_shape = (4, 42, 42)
 
