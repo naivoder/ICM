@@ -11,6 +11,8 @@
 
 ## Overview
 
+Note to self: different values of T_MAX have a significant effect for different environments...  
+
 This repository contains an implementation of the Intrinsic Curiosity Module (ICM) built upon an A3C (Asynchronous Advantage Actor-Critic) backend using PyTorch. The ICM encourages exploration by predicting an agent's next state given its current state and action, generating an intrinsic reward that complements extrinsic rewards from the environment. The algorithm is evaluated on various Atari environments using Gymnasium.
 
 ## Setup

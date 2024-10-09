@@ -19,8 +19,8 @@ class ParallelEnv:
         global_icm = ICM(input_shape, n_actions)
         global_icm.share_memory()  # ???
 
-        optimizer = SharedAdam(global_agent.parameters(), lr=3e-4)
-        icm_optimizer = SharedAdam(global_icm.parameters(), lr=3e-4)
+        optimizer = SharedAdam(global_agent.parameters(), lr=1e-4)
+        icm_optimizer = SharedAdam(global_icm.parameters(), lr=1e-4)
 
         self.ps = [
             mp.Process(
