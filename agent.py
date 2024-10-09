@@ -119,7 +119,7 @@ class A3C(torch.nn.Module):
 if __name__ == "__main__":
     state_size = (4, 42, 42)
     n_actions = 6
-    model = ActorCritic(state_size, n_actions)
+    model = A3C(state_size, n_actions)
     x = torch.randn(1, *state_size)
     hidden_state = torch.zeros(1, 256)
     action, v, log_prob, hidden_state = model(x, hidden_state)
