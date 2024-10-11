@@ -40,8 +40,6 @@ You can run the ICM-enhanced A3C algorithm on any supported Gymnasium Atari envi
 python main.py --env 'MsPacmanNoFrameskip-v4'
 ```
 
-#### Command-Line Arguments
-
 - **Environment Selection**: Use `-e` or `--env` to specify the Gymnasium environment. The default is `None`, so you must specify an environment.
   
   Example:
@@ -50,36 +48,20 @@ python main.py --env 'MsPacmanNoFrameskip-v4'
   python main.py --env 'PongNoFrameskip-v4'
   ```
 
-- **Number of Learning Steps**: Use `--n_steps` to define how many training steps the agent should undergo. The default is 1,000,000 steps.
+- **Number of Training Episodes**: Use `--n_games` to specify the number of games the agent should play during training.
 
   Example:
 
   ```bash
-  python main.py --env 'BreakoutNoFrameskip-v4' --n_steps 200000
+  python main.py --n_games 5000
   ```
 
-- **Parallel Environments**: Use `--n_envs` to specify the number of parallel environments to run during training. The default is 32 environments, optimizing the training process.
+- **Parallel Environments**: Use `--n_envs` to specify the number of parallel environments to run during training. The default is 4.
 
   Example:
 
   ```bash
   python main.py --env 'AsterixNoFrameskip-v4' --n_envs 16
-  ```
-
-- **Curiosity Weight**: Use `--curiosity_beta` to adjust the weight of the intrinsic reward relative to the extrinsic reward. This allows tuning of exploration behavior.
-
-  Example:
-
-  ```bash
-  python main.py --env 'AsteroidsNoFrameskip-v4' --curiosity_beta 0.2
-  ```
-
-- **Continue Training**: Use `--continue_training` to determine whether to continue training from saved weights. The default is `True`, allowing you to resume training from where you left off.
-
-  Example:
-
-  ```bash
-  python main.py --env 'AsteroidsNoFrameskip-v4' --continue_training False
   ```
 
 Using a Conda environment along with these flexible command-line options will help you efficiently manage your dependencies and customize the training process for your specific needs.
