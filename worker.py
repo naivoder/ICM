@@ -104,7 +104,9 @@ def worker(
                 best_score = avg_score
                 torch.save(global_agent.state_dict(), f"weights/{env_id}_best.pth")
 
-            print(f"Episode: {episode}, Score: {score:.2f}, Avg Score: {avg_score:.2f}")
+            print(
+                f"Episode: {episode}, Score: {score:.2f}, Reward: {intrinsic_reward:.2f}, Avg Score: {avg_score:.2f}"
+            )
 
     if name == "1":
         torch.save(global_agent.state_dict(), f"weights/{env_id}_final.pth")
