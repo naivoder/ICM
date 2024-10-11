@@ -4,13 +4,19 @@ from shared_adam import SharedAdam
 from worker import worker
 from agent import A3C
 from icm import ICM
+from ale_py import ALEInterface, LoggerMode
+from config import environments
+import warnings
 import gymnasium as gym
+
+warnings.simplefilter("ignore")
+ALEInterface.setLoggerMode(LoggerMode.Error)
 
 os.environ["OMP_NUM_THREADS"] = "1"
 
 
 class ParallelEnv:
-    def __init__(self, env_id, n_threads, input_shape, n_actions, global_ep):
+    def __init__(self, env_id, n_threads, input_shape, n_actions):
         names = [str(i) for i in range(n_threads)]
 
         global_agent = A3C(input_shape, n_actions)
@@ -19,8 +25,8 @@ class ParallelEnv:
         global_icm = ICM(input_shape, n_actions)
         global_icm.share_memory()  # ???
 
-        optimizer = SharedAdam(global_agent.parameters(), lr=1e-4)
-        icm_optimizer = SharedAdam(global_icm.parameters(), lr=1e-4)
+        optimizer = SharedAdam(global_agent.parameters(), lr=3e-5)
+        icm_optimizer = SharedAdam(global_icm.parameters(), lr=1e-3)
 
         self.ps = [
             mp.Process(
@@ -34,7 +40,6 @@ class ParallelEnv:
                     global_icm,
                     icm_optimizer,
                     env_id,
-                    global_ep,
                 ),
             )
             for name in names
@@ -45,17 +50,51 @@ class ParallelEnv:
 
 
 if __name__ == "__main__":
-    mp.set_start_method("forkserver")
-    gloabl_ep = mp.Value("i", 0)
+    from argparse import ArgumentParser
 
-    env_id = "MsPacmanNoFrameskip-v4"
-    config_env = gym.make(env_id)
+    parser = ArgumentParser()
+    parser.add_argument(
+        "-e", "--env", default=None, help="Environment name from Gymnasium"
+    )
+    parser.add_argument(
+        "--n_threads",
+        default=4,
+        type=int,
+        help="Number of parallel environments during training",
+    )
+    parser.add_argument(
+        "--n_games",
+        default=1000,
+        type=int,
+        help="Total number of episodes (games) to play during training",
+    )
+    args = parser.parse_args()
 
-    print("Observation space:", config_env.observation_space)
-    print("Action space:", config_env.action_space)
+    for fname in ["metrics", "environments", "weights", "csv"]:
+        if not os.path.exists(fname):
+            os.makedirs(fname)
 
-    n_threads = 8
-    n_actions = config_env.action_space.n
     input_shape = (4, 42, 42)
 
-    env = ParallelEnv(env_id, n_threads, input_shape, n_actions, gloabl_ep)
+    if args.env:
+        config_env = gym.make(args.env)
+        n_actions = config_env.action_space.n
+
+        print("Environment:", args.env)
+        print("Observation space:", config_env.observation_space)
+        print("Action space:", config_env.action_space)
+
+        mp.set_start_method("forkserver")
+        env = ParallelEnv(args.env, args.n_threads, input_shape, n_actions)
+    else:
+        for env_name in environments:
+            args.env = env_name
+            config_env = gym.make(args.env)
+            n_actions = config_env.action_space.n
+
+            print("Environment:", args.env)
+            print("Observation space:", config_env.observation_space)
+            print("Action space:", config_env.action_space)
+
+            mp.set_start_method("forkserver")
+            env = ParallelEnv(args.env, args.n_threads, input_shape, n_actions)
