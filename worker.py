@@ -2,7 +2,7 @@ import numpy as np
 import torch
 from memory import Memory
 from agent import A3C
-from utils import plot_learning_curve
+import utils
 from wrappers import make_env
 from icm import ICM
 
@@ -16,7 +16,6 @@ def worker(
     global_icm,
     icm_optimizer,
     env_id,
-    global_idx,
 ):
     T_MAX = 50
 
@@ -29,6 +28,7 @@ def worker(
     env = make_env(env_id, shape)
 
     episode, max_eps, t_steps, scores = 0, 1000, 0, []
+    best_score = min(env.reward_range)
 
     while episode < max_eps:
         state, _ = env.reset()
@@ -95,17 +95,22 @@ def worker(
                 memory.clear()
 
         episode += 1
-        with global_idx.get_lock():
-            global_idx.value += 1
 
         if name == "1":
             scores.append(score)
             avg_score = np.mean(scores[-100:])
 
-            print(
-                f"Ep: {episode}/{max_eps}, Score: {score:.2f}, Reward: {intrinsic_reward.sum().item():.2f}, Avg Score: {avg_score:.2f}"
-            )
+            if avg_score > best_score:
+                best_score = avg_score
+                torch.save(global_agent.state_dict(), f"weights/{env_id}_best.pth")
+
+            print(f"Episode: {episode}, Score: {score:.2f}, Avg Score: {avg_score:.2f}")
 
     if name == "1":
+        torch.save(global_agent.state_dict(), f"weights/{env_id}_final.pth")
+
         x = [i for i in range(episode)]
-        plot_learning_curve(x, scores, f"results/{env_id}_icm.png")
+        utils.plot_learning_curve(x, scores, f"{env_id}_learning_curve.png")
+
+        global_agent.load_state_dict(torch.load(f"weights/{env_id}_best.pth"))
+        utils.save_best_version(env, global_agent, f"environments/{env_id}.gif")
