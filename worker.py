@@ -112,7 +112,7 @@ def worker(
         torch.save(global_agent.state_dict(), f"weights/{env_id}_final.pth")
 
         x = [i for i in range(episode)]
-        utils.plot_learning_curve(x, scores, f"{env_id}_learning_curve.png")
+        utils.plot_learning_curve(x, scores, f"metrics/{env_id}_learning_curve.png")
 
         global_agent.load_state_dict(torch.load(f"weights/{env_id}_best.pth"))
         utils.save_best_version(env, global_agent, f"environments/{env_id}.gif")
