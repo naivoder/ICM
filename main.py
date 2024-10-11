@@ -25,8 +25,8 @@ class ParallelEnv:
         global_icm = ICM(input_shape, n_actions)
         global_icm.share_memory()  # ???
 
-        optimizer = SharedAdam(global_agent.parameters(), lr=3e-5)
-        icm_optimizer = SharedAdam(global_icm.parameters(), lr=1e-3)
+        optimizer = SharedAdam(global_agent.parameters(), lr=1e-4)
+        icm_optimizer = SharedAdam(global_icm.parameters(), lr=1e-4)
 
         self.ps = [
             mp.Process(
@@ -58,13 +58,13 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--n_threads",
-        default=4,
+        default=5,
         type=int,
         help="Number of parallel environments during training",
     )
     parser.add_argument(
         "--n_games",
-        default=1000,
+        default=2000,
         type=int,
         help="Total number of episodes (games) to play during training",
     )

@@ -17,7 +17,7 @@ def worker(
     icm_optimizer,
     env_id,
 ):
-    T_MAX = 50
+    T_MAX = 250
 
     local_agent = A3C(input_shape, n_actions)
     local_icm = ICM(input_shape, n_actions)
@@ -82,7 +82,6 @@ def worker(
 
                 icm_optimizer.zero_grad()
                 (inv_loss + forward_loss).backward()
-                torch.nn.utils.clip_grad_norm_(local_icm.parameters(), 40)
 
                 for local_param, global_param in zip(
                     local_icm.parameters(), global_icm.parameters()
@@ -100,7 +99,7 @@ def worker(
             scores.append(score)
             avg_score = np.mean(scores[-100:])
 
-            if avg_score > best_score:
+            if avg_score > best_score and episode > 100:
                 best_score = avg_score
                 torch.save(global_agent.state_dict(), f"weights/{env_id}_best.pth")
 
