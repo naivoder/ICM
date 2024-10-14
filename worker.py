@@ -16,6 +16,7 @@ def worker(
     global_icm,
     icm_optimizer,
     env_id,
+    max_eps,
 ):
     T_MAX = 250
 
