@@ -28,7 +28,8 @@ def worker(
     shape = [input_shape[1], input_shape[2], 1]
     env = make_env(env_id, shape)
 
-    episode, max_eps, t_steps, scores = 0, 1000, 0, []
+    episode, t_steps = 0, 0
+    scores = []
     best_score = min(env.reward_range)
 
     while episode < max_eps:
