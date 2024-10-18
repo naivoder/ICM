@@ -47,7 +47,7 @@ class ParallelEnv:
         ]
 
         [p.start() for p in self.ps]
-        [p.join() for p in self.ps]
+        [p.join(timeout=10) for p in self.ps]
 
 
 if __name__ == "__main__":
