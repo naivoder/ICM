@@ -74,7 +74,7 @@ def worker(
                 with torch.multiprocessing.Lock():
                     optimizer.zero_grad()
                     loss.backward()
-                    torch.nn.utils.clip_grad_norm_(local_agent.parameters(), 40)
+                    torch.nn.utils.clip_grad_norm_(local_agent.parameters(), 10)
 
                     for local_param, global_param in zip(
                         local_agent.parameters(), global_agent.parameters()
@@ -84,8 +84,10 @@ def worker(
                     optimizer.step()
                     local_agent.load_state_dict(global_agent.state_dict())
 
+                with torch.multiprocessing.Lock():
                     icm_optimizer.zero_grad()
                     (inv_loss + forward_loss).backward()
+                    torch.nn.utils.clip_grad_norm_(local_icm.parameters(), 10)
 
 
                     for local_param, global_param in zip(

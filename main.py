@@ -12,8 +12,6 @@ import gymnasium as gym
 warnings.simplefilter("ignore")
 ALEInterface.setLoggerMode(LoggerMode.Error)
 
-os.environ["OMP_NUM_THREADS"] = "1"
-
 
 class ParallelEnv:
     def __init__(self, env_id, n_threads, input_shape, n_actions, n_games):
@@ -25,8 +23,8 @@ class ParallelEnv:
         global_icm = ICM(input_shape, n_actions)
         global_icm.share_memory()  # ???
 
-        optimizer = SharedAdam(global_agent.parameters(), lr=1e-4)
-        icm_optimizer = SharedAdam(global_icm.parameters(), lr=1e-4)
+        optimizer = SharedAdam(global_agent.parameters(), lr=3e-5)
+        icm_optimizer = SharedAdam(global_icm.parameters(), lr=3e-5)
 
         self.ps = [
             mp.Process(
@@ -47,11 +45,12 @@ class ParallelEnv:
         ]
 
         [p.start() for p in self.ps]
-        [p.join(timeout=10) for p in self.ps]
+        [p.join() for p in self.ps]
 
 
 if __name__ == "__main__":
     from argparse import ArgumentParser
+    import torch
 
     parser = ArgumentParser()
     parser.add_argument(
@@ -59,17 +58,21 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--n_threads",
-        default=5,
+        default=4,
         type=int,
         help="Number of parallel environments during training",
     )
     parser.add_argument(
         "--n_games",
-        default=2000,
+        default=5000,
         type=int,
         help="Total number of episodes (games) to play during training",
     )
     args = parser.parse_args()
+
+    # os.environ["OMP_NUM_THREADS"] = "1"
+    torch.set_num_threads(4)
+
 
     for fname in ["metrics", "environments", "weights", "csv"]:
         if not os.path.exists(fname):
